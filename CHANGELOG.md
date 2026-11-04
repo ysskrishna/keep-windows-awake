@@ -16,7 +16,7 @@ First release.
 - **Safe cleanup.** The wake request is cleared when the command ends, when you press Ctrl+C, and when the wait fails.
 - **Clear errors.** A session in Constrained Language mode, a bad `-t` or `-w`, a missing process and a stray argument each print one line, with exit code `1` or `2`, instead of a .NET error.
 - **Methods guide** ([`docs/methods.md`](docs/methods.md)): what works under which restriction (blocked script files, Constrained Language mode, Windows Home, Group Policy locks).
-- **Docs:** troubleshooting with common questions, macOS and Linux equivalents, and a record of what was tested ([`docs/tested.md`](docs/tested.md)).
+- **Docs:** troubleshooting with common questions, other ways to install, and macOS and Linux equivalents.
 - **Tests and CI.** Pester tests for arguments, language mode and the wake request itself, PSScriptAnalyzer, and `scripts/validate.sh` for version agreement and ASCII-only files. They run on `windows-latest` in Windows PowerShell 5.1 and PowerShell 7.
 - **Release workflow.** A `v*` tag creates a GitHub Release with `caffeinate.ps1` and a SHA-256 file, after checking the tag against the script version and this changelog.
 - `LICENSE`, `SECURITY.md`, `CODEOWNERS`, `FUNDING.yml` and issue templates.

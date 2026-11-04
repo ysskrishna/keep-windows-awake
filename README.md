@@ -24,11 +24,10 @@ Pasting works even when script files are blocked, because the execution policy a
 
 | Your situation | What to use |
 |---|---|
-| Nothing blocked, or only installers (PowerToys, winget) are | `caffeinate`, pasted or from the file |
-| Script files are blocked (execution policy) | Paste the file into the console |
-| PowerShell is in Constrained Language mode (AppLocker or WDAC) | `caffeinate` cannot run. Use Presentation Settings or the power plan |
-| Windows Home edition | Power plan in Settings |
-| A Group Policy locks the session after inactivity | Nothing here stops it |
+| Nothing blocked, only installers (PowerToys, winget) are, or script files are blocked | [`caffeinate`, pasted into the console](docs/methods.md#1-the-caffeinate-command) |
+| PowerShell is in Constrained Language mode (AppLocker or WDAC) | [Presentation Settings](docs/methods.md#2-presentation-settings) or [the power settings](docs/methods.md#3-the-power-settings) |
+| Windows Home edition | [The power settings](docs/methods.md#3-the-power-settings) |
+| A Group Policy locks the session after inactivity | [Nothing here stops it](docs/methods.md#4-a-group-policy-lock) |
 
 Each method, what it needs, what it cannot do and how to undo it is in [docs/methods.md](docs/methods.md).
 
@@ -58,69 +57,17 @@ macOS and Linux equivalents are in [docs/macos-linux.md](docs/macos-linux.md).
 
 ## What it cannot do
 
-It asks Windows not to sleep, the way a video player does. It does not press keys or move the mouse. Microsoft documents these limits of the API it uses ([SetThreadExecutionState](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setthreadexecutionstate)):
-
-- It cannot stop you, or a policy, from putting the PC to sleep with the lid, the power button or Start > Sleep.
-- It does not stop the screen saver.
-
-A Group Policy such as "Interactive logon: Machine inactivity limit" locks the session after a period without *user input* ([Microsoft](https://learn.microsoft.com/en-us/previous-versions/windows/it-pro/windows-10/security/threat-protection/security-policy-settings/interactive-logon-machine-inactivity-limit)). A wake request is not user input, so such a lock is not expected to stop. See [docs/methods.md](docs/methods.md#5-a-group-policy-lock).
-
-## Other ways to use it
-
-<details>
-<summary><b>As a file</b></summary>
-
-Download `caffeinate.ps1` from the [latest release](https://github.com/ysskrishna/keep-windows-awake/releases/latest), or copy [`src/caffeinate.ps1`](src/caffeinate.ps1). Then:
-
-```powershell
-.\caffeinate.ps1 -d -t 3600
-```
-
-Or load it as a command for the session:
-
-```powershell
-. .\caffeinate.ps1
-caffeinate -t 3600
-```
-
-If Windows says the file cannot be loaded, the execution policy is blocking script files. Paste the file instead (Quick start). A file downloaded in a browser also carries a "from the internet" mark, which `RemoteSigned` blocks until you run `Unblock-File .\caffeinate.ps1`. Only do that for a file you have read.
-
-</details>
-
-<details>
-<summary><b>Check a release download</b></summary>
-
-Each release has `caffeinate.ps1` and `caffeinate.ps1.sha256`. Compare the hash of your copy with the one in the `.sha256` file:
-
-```powershell
-(Get-FileHash .\caffeinate.ps1 -Algorithm SHA256).Hash
-```
-
-</details>
-
-<details>
-<summary><b>Available in every new window (PowerShell profile)</b></summary>
-
-Save `caffeinate.ps1` somewhere permanent, then add a line to your profile that loads it:
-
-```powershell
-if (-not (Test-Path $PROFILE)) { New-Item -ItemType File -Path $PROFILE -Force | Out-Null }
-Add-Content $PROFILE '. "C:\Tools\caffeinate.ps1"'
-```
-
-Change the path to where you saved the file. Windows PowerShell and PowerShell 7 each have their own `$PROFILE`, so repeat this in the one you use. Profiles are script files, so a restrictive execution policy stops them from loading. More in [docs/troubleshooting.md](docs/troubleshooting.md).
-
-</details>
+It asks Windows not to sleep, the way a video player does. It does not press keys or move the mouse. Microsoft documents these limits of the API it uses ([SetThreadExecutionState](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setthreadexecutionstate)): it cannot stop you, or a policy, from putting the PC to sleep with the lid, the power button or Start > Sleep, and it does not stop the screen saver. A Group Policy inactivity lock is a separate control ([details](docs/methods.md#4-a-group-policy-lock)).
 
 ## Documentation
 
 | Guide | What is in it |
 |---|---|
 | [docs/methods.md](docs/methods.md) | What works under which restriction, with commands and limits |
+| [docs/install.md](docs/install.md) | Run it as a file, check a release download, load it in every window |
 | [docs/troubleshooting.md](docs/troubleshooting.md) | Find out which restriction you hit, read each message, and common questions |
 | [docs/macos-linux.md](docs/macos-linux.md) | The same job on macOS and Linux, with built-in tools |
-| [docs/tested.md](docs/tested.md) | What was run, on what, and when |
-| [docs/development.md](docs/development.md) | Tests, checks, releases |
+| [docs/development.md](docs/development.md) | Tests, what was tested, releases |
 
 Reporting a vulnerability: see [SECURITY.md](SECURITY.md).
 

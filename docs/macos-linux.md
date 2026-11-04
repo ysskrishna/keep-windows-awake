@@ -27,7 +27,3 @@ The Windows command was written to take the same flags, so a macOS habit carries
 - `sleep infinity` is a GNU `sleep` feature.
 - Whether a given desktop environment honors the lock is up to it.
 - Keeping the display on needs the desktop's own settings or tools, and is not covered.
-
-## Running PowerShell on macOS or Linux
-
-The command prints `this version is for Windows` and exits with `1` there. It calls a Windows-only API, so use the built-in tools above.

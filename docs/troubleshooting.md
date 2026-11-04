@@ -13,10 +13,10 @@ Get-ExecutionPolicy -List
 
 | What you see | What it means | What to do |
 |---|---|---|
-| `LanguageMode` is `FullLanguage` | `caffeinate` can run | Use [method 1 or 2](methods.md) |
-| `LanguageMode` is `ConstrainedLanguage` | PowerShell blocks the Windows call `caffeinate` needs ([Microsoft](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_language_modes)) | Use [method 3 or 4](methods.md) |
+| `LanguageMode` is `FullLanguage` | `caffeinate` can run | Use [method 1](methods.md#1-the-caffeinate-command) |
+| `LanguageMode` is `ConstrainedLanguage` | PowerShell blocks the Windows call `caffeinate` needs ([Microsoft](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_language_modes)) | Use [method 2 or 3](methods.md#2-presentation-settings) |
 | `Get-ExecutionPolicy -List` shows `Restricted` or `AllSigned` for `CurrentUser` or `LocalMachine`, or any value for `MachinePolicy` or `UserPolicy` | Script files, and your profile, may not load | Paste the function instead of loading the file |
-| The edition name contains `Home` | `PresentationSettings` is not available there | Use [method 4](methods.md) |
+| The edition name contains `Home` | `PresentationSettings` is not available there | Use [method 3](methods.md#3-the-power-settings) |
 
 `MachinePolicy` and `UserPolicy` are set by Group Policy. They take precedence over the other scopes ([Microsoft](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies)).
 
@@ -24,7 +24,7 @@ Get-ExecutionPolicy -List
 
 | Message | Cause | Fix |
 |---|---|---|
-| `this session is in ConstrainedLanguage mode, which blocks the Windows call this needs` | AppLocker or WDAC puts PowerShell in Constrained Language mode | [Methods 3 and 4](methods.md) |
+| `this session is in ConstrainedLanguage mode, which blocks the Windows call this needs` | AppLocker or WDAC puts PowerShell in Constrained Language mode | [Methods 2 and 3](methods.md#2-presentation-settings) |
 | `-t needs a whole number of seconds, 1 or more.` | `-t` was `0`, negative, a fraction, text, or more than 9 digits | Use whole seconds, for example `-t 3600` |
 | `-w needs a process id.` | `-w` was not a positive whole number | Find the id with `Get-Process`, then `-w <id>` |
 | `no process with id N.` | No process has that id now | Check it with `Get-Process -Id N` |
@@ -37,7 +37,7 @@ Get-ExecutionPolicy -List
 
 **`The term 'caffeinate' is not recognized`**
 
-The command is not defined in this window. A pasted function lasts only for the window you pasted it into. Paste it again, or load it from the file or a [profile](../README.md#other-ways-to-use-it).
+The command is not defined in this window. A pasted function lasts only for the window you pasted it into. Paste it again, or load it from the file or a [profile](install.md#make-it-available-in-every-new-window).
 
 **`File ... cannot be loaded because running scripts is disabled on this system`**
 
@@ -55,7 +55,7 @@ Profiles are script files, so the execution policy applies to them. Also, Window
 
 **Will it stop my screen from locking?**
 
-It stops the PC from going to sleep, and with `-d` the display from turning off for being idle. It does not stop the screen saver ([Microsoft](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setthreadexecutionstate)). A Group Policy inactivity lock is a separate control. See [methods.md](methods.md#5-a-group-policy-lock).
+It stops the PC from going to sleep, and with `-d` the display from turning off for being idle. It does not stop the screen saver ([Microsoft](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setthreadexecutionstate)). A Group Policy inactivity lock is a separate control. See [methods.md](methods.md#4-a-group-policy-lock).
 
 **Will it keep the PC awake when I close the lid?**
 
@@ -67,7 +67,7 @@ The request ends. It belongs to the thread that made it, and the thread ends wit
 
 **Does it change any Windows setting, or need admin rights?**
 
-No to both. It makes one API call and clears it when it ends. It does not touch the power plan, the registry, files or scheduled tasks, and it never asks for elevation. If you want a permanent change instead, see [method 4](methods.md#4-the-power-settings).
+No to both. It makes one API call and clears it when it ends. It does not touch the power plan, the registry, files or scheduled tasks, and it never asks for elevation. If you want a permanent change instead, see [method 3](methods.md#3-the-power-settings).
 
 **Does it keep chat apps from showing me as Away?**
 
