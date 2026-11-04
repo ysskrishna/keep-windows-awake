@@ -8,7 +8,8 @@ BeforeAll {
     # Runs caffeinate with named parameters and returns what it printed plus the exit code.
     function Invoke-Caffeinate {
         param([hashtable]$Params = @{})
-        $text = caffeinate @Params 6>&1 | Out-String
+        # Out-String wraps at the console width, so collapse whitespace before matching.
+        $text = (caffeinate @Params 6>&1 | Out-String) -replace '\s+', ' '
         [pscustomobject]@{ Text = $text; ExitCode = $global:LASTEXITCODE }
     }
 
