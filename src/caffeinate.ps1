@@ -52,20 +52,6 @@ Project: https://github.com/ysskrishna/keep-windows-awake
 .LINK
 https://github.com/ysskrishna/keep-windows-awake
 #>
-[CmdletBinding(PositionalBinding = $false)]
-param(
-    [switch]$d,
-    [switch]$i,
-    [switch]$m,
-    [switch]$s,
-    [switch]$u,
-    $t,
-    $w,
-    [Parameter(ValueFromRemainingArguments = $true)]$command
-)
-
-# >>> function begin
-# keep-windows-awake 1.0.0 - https://github.com/ysskrishna/keep-windows-awake
 function caffeinate {
     [CmdletBinding(PositionalBinding = $false)]
     param([switch]$d, [switch]$i, [switch]$m, [switch]$s, [switch]$u, $t, $w, [Parameter(ValueFromRemainingArguments = $true)]$command)
@@ -163,10 +149,10 @@ function caffeinate {
         try { Write-Host 'caffeinate: stopped. Windows follows its normal sleep settings again.' } catch { $null = $_ }
     }
 }
-# <<< function end
 
-# Run the command when this file is executed; only define it when dot-sourced.
-if ($MyInvocation.InvocationName -ne '.') {
-    caffeinate @PSBoundParameters
+# When this file is run (.\caffeinate.ps1 -d -t 3600), run the command. When it is pasted
+# into a console or dot-sourced, only define it.
+if ($MyInvocation.InvocationName -ne '.' -and $MyInvocation.MyCommand -is [System.Management.Automation.ExternalScriptInfo]) {
+    caffeinate @args
     exit $global:LASTEXITCODE
 }
