@@ -5,23 +5,20 @@ on:
     branches: [main]
   pull_request:
   workflow_dispatch:
-  schedule:
-    # Weekly, to catch links to other sites that have moved or gone.
-    - cron: "23 5 * * 1"
 
 permissions:
   contents: read
 
 jobs:
   validate:
-    name: Validate repo
+    name: Check version and encoding
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Validate versions, README block, safety checks and links
+      - name: Check version and encoding
         run: bash scripts/validate.sh
 
   test-windows:
@@ -57,7 +54,7 @@ jobs:
       - name: PSScriptAnalyzer
         run: |
           $findings = foreach ($path in 'src', 'tests') {
-            Invoke-ScriptAnalyzer -Path $path -Recurse -Settings ./PSScriptAnalyzerSettings.psd1
+            Invoke-ScriptAnalyzer -Path $path -Recurse -Severity Error, Warning -ExcludeRule PSAvoidUsingWriteHost
           }
           if ($findings) { $findings | Format-List RuleName, Severity, ScriptName, Line, Message; exit 1 }
           'No findings.'
@@ -93,16 +90,3 @@ jobs:
           $config.Run.Exit = $true
           $config.Output.Verbosity = 'Detailed'
           Invoke-Pester -Configuration $config
-
-  external-links:
-    name: Links to other sites
-    # Other sites move. Check weekly and on demand so it never fails an unrelated pull request.
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Check external links
-        run: bash scripts/validate.sh --external

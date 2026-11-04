@@ -13,10 +13,10 @@ Get-ExecutionPolicy -List
 
 | What you see | What it means | What to do |
 |---|---|---|
-| `LanguageMode` is `FullLanguage` | `caffeinate` can run | Use [method 1 or 2](methods.md) |
-| `LanguageMode` is `ConstrainedLanguage` | PowerShell blocks the Windows call `caffeinate` needs ([Microsoft](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_language_modes)) | Use [method 3 or 4](methods.md) |
+| `LanguageMode` is `FullLanguage` | `caffeinate` can run | Use [method 1](methods.md#1-the-caffeinate-command) |
+| `LanguageMode` is `ConstrainedLanguage` | PowerShell blocks the Windows call `caffeinate` needs ([Microsoft](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_language_modes)) | Use [method 2 or 3](methods.md#2-presentation-settings) |
 | `Get-ExecutionPolicy -List` shows `Restricted` or `AllSigned` for `CurrentUser` or `LocalMachine`, or any value for `MachinePolicy` or `UserPolicy` | Script files, and your profile, may not load | Paste the function instead of loading the file |
-| The edition name contains `Home` | `PresentationSettings` is not available there | Use [method 4](methods.md) |
+| The edition name contains `Home` | `PresentationSettings` is not available there | Use [method 3](methods.md#3-the-power-settings) |
 
 `MachinePolicy` and `UserPolicy` are set by Group Policy. They take precedence over the other scopes ([Microsoft](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_execution_policies)).
 
@@ -24,7 +24,7 @@ Get-ExecutionPolicy -List
 
 | Message | Cause | Fix |
 |---|---|---|
-| `this session is in ConstrainedLanguage mode, which blocks the Windows call this needs` | AppLocker or WDAC puts PowerShell in Constrained Language mode | [Methods 3 and 4](methods.md) |
+| `this session is in ConstrainedLanguage mode, which blocks the Windows call this needs` | AppLocker or WDAC puts PowerShell in Constrained Language mode | [Methods 2 and 3](methods.md#2-presentation-settings) |
 | `-t needs a whole number of seconds, 1 or more.` | `-t` was `0`, negative, a fraction, text, or more than 9 digits | Use whole seconds, for example `-t 3600` |
 | `-w needs a process id.` | `-w` was not a positive whole number | Find the id with `Get-Process`, then `-w <id>` |
 | `no process with id N.` | No process has that id now | Check it with `Get-Process -Id N` |
@@ -37,7 +37,7 @@ Get-ExecutionPolicy -List
 
 **`The term 'caffeinate' is not recognized`**
 
-The command is not defined in this window. A pasted function lasts only for the window you pasted it into. Paste it again, or load it from a file or a [profile](../README.md#other-ways-to-install).
+The command is not defined in this window. A pasted function lasts only for the window you pasted it into. Paste it again, or load it from the file or a [profile](install.md#make-it-available-in-every-new-window).
 
 **`File ... cannot be loaded because running scripts is disabled on this system`**
 
@@ -51,8 +51,40 @@ A file downloaded in a browser carries a "from the internet" mark, and `RemoteSi
 
 Profiles are script files, so the execution policy applies to them. Also, Windows PowerShell and PowerShell 7 each have their own `$PROFILE`. Check the path with `$PROFILE`, and that the file exists with `Test-Path $PROFILE`.
 
-## It runs, but the PC still sleeps or locks
+## Questions
 
-See the [FAQ](faq.md). In short: the lid, the power button and Start > Sleep always win, the screen saver is not stopped, and a Group Policy inactivity lock is a separate control.
+**Will it stop my screen from locking?**
 
-If none of that applies, [open an issue](https://github.com/ysskrishna/keep-windows-awake/issues/new/choose) with the output of the four commands above and the command you ran.
+It stops the PC from going to sleep, and with `-d` the display from turning off for being idle. It does not stop the screen saver ([Microsoft](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setthreadexecutionstate)). A Group Policy inactivity lock is a separate control. See [methods.md](methods.md#4-a-group-policy-lock).
+
+**Will it keep the PC awake when I close the lid?**
+
+No. Microsoft says the function cannot stop a user from putting the computer to sleep, and that includes the lid, the power button and Start > Sleep ([Microsoft](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setthreadexecutionstate)). What closing the lid does is a power setting you choose in Windows.
+
+**What happens when I close the PowerShell window?**
+
+The request ends. It belongs to the thread that made it, and the thread ends with the window ([Microsoft](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-setthreadexecutionstate)). Keep the window open while you need the PC awake. You can minimize it.
+
+**Does it change any Windows setting, or need admin rights?**
+
+No to both. It makes one API call and clears it when it ends. It does not touch the power plan, the registry, files or scheduled tasks, and it never asks for elevation. If you want a permanent change instead, see [method 3](methods.md#3-the-power-settings).
+
+**Does it keep chat apps from showing me as Away?**
+
+Those apps use their own idle detection. This command sends no keyboard or mouse input, so it is not meant for that.
+
+**Does it use battery faster?**
+
+Keeping the system awake means the PC does not enter its low-power sleep state while the command runs. Keeping the display on with `-d` uses more again. Plug in for long runs.
+
+**Why does it not move the mouse or press a key?**
+
+By design. A wake request is what a video player uses. Fake input is out of scope, because some managed environments treat it as getting around a control. See [methods.md](methods.md#not-covered-on-purpose).
+
+**Can I use the macOS flags I know?**
+
+`-d`, `-i`, `-t` and `-w` work. `-m`, `-s`, `-u` and running a command (`caffeinate -i make`) do not. See the [table in the README](../README.md#usage).
+
+## Still stuck
+
+[Open an issue](https://github.com/ysskrishna/keep-windows-awake/issues/new/choose) with the output of the four commands at the top of this page and the command you ran.

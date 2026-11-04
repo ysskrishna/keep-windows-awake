@@ -90,6 +90,22 @@ Describe 'running as a file' {
         $out | Should -Match '-u not supported'
     }
 
+    It 'can be pasted into a console: defines the command and does not run it' {
+        $stdin = Join-Path ([IO.Path]::GetTempPath()) "caffeinate-paste-$PID.txt"
+        $stdout = Join-Path ([IO.Path]::GetTempPath()) "caffeinate-paste-out-$PID.txt"
+        try {
+            # What a paste does: the whole file, then a command typed after it.
+            Set-Content -Path $stdin -Value ((Get-Content -Raw $script:Source) + "`ncaffeinate -m`n") -Encoding ASCII
+            $p = Start-Process -FilePath $script:HostPath -ArgumentList '-NoProfile', '-ExecutionPolicy', 'Bypass', '-Command', '-' `
+                -RedirectStandardInput $stdin -RedirectStandardOutput $stdout -NoNewWindow -PassThru
+            $exited = $p.WaitForExit(60000)
+            if (-not $exited) { Stop-Process -Id $p.Id -Force -ErrorAction SilentlyContinue }
+            $exited | Should -BeTrue -Because 'pasting the file must not start the command'
+            (Get-Content -Raw $stdout) | Should -Match '-m not supported on Windows'
+        }
+        finally { Remove-Item $stdin, $stdout -Force -ErrorAction SilentlyContinue }
+    }
+
     It 'only defines the function when dot-sourced' {
         $cmd = ". '$($script:Source)'; (Get-Command caffeinate -CommandType Function).Name"
         $out = & $script:HostPath -NoProfile -ExecutionPolicy Bypass -Command $cmd 2>&1 | Out-String
