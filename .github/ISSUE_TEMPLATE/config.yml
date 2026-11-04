@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Troubleshooting
+    url: https://github.com/ysskrishna/keep-windows-awake/blob/main/docs/troubleshooting.md
+    about: Work out which restriction you hit, and what to try.
+  - name: Report a security problem
+    url: https://github.com/ysskrishna/keep-windows-awake/security/advisories/new
+    about: Report privately, not in a public issue.

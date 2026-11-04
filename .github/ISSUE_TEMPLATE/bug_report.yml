@@ -1,0 +1,74 @@
+name: Bug report
+description: The command failed, the machine slept anyway, or the script misbehaved
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. Check [Troubleshooting](https://github.com/ysskrishna/keep-windows-awake/blob/main/docs/troubleshooting.md) first.
+        For a security problem, do not file an issue. See [SECURITY.md](https://github.com/ysskrishna/keep-windows-awake/blob/main/SECURITY.md).
+        The commands below only read information. They change nothing.
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: The release you downloaded, or the first line of the function you pasted (`# keep-windows-awake X.Y.Z`).
+      placeholder: "1.0.0"
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: Windows edition and build
+      description: Output of `(Get-CimInstance Win32_OperatingSystem).Caption`.
+      placeholder: "Microsoft Windows 11 Pro"
+    validations:
+      required: true
+  - type: input
+    id: powershell
+    attributes:
+      label: PowerShell version
+      description: Output of `$PSVersionTable.PSVersion`, and which shell you used (Windows PowerShell or PowerShell 7).
+      placeholder: "5.1.26100.1 (Windows PowerShell)"
+    validations:
+      required: true
+  - type: input
+    id: language-mode
+    attributes:
+      label: Language mode
+      description: Output of `$ExecutionContext.SessionState.LanguageMode`.
+      placeholder: "FullLanguage"
+    validations:
+      required: true
+  - type: dropdown
+    id: how
+    attributes:
+      label: How you ran it
+      options:
+        - Pasted the function into the console
+        - Dot-sourced the file
+        - Ran the file (.\caffeinate.ps1)
+        - Loaded from $PROFILE
+    validations:
+      required: true
+  - type: textarea
+    id: command
+    attributes:
+      label: The command you ran
+      placeholder: "caffeinate -d -t 3600"
+      render: powershell
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What you expected, and what the machine did instead. Say whether the laptop is managed by an employer or school.
+    validations:
+      required: true
+  - type: textarea
+    id: output
+    attributes:
+      label: Output or error text
+      description: Remove private paths and names first.
+      render: text

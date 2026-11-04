@@ -1,0 +1,108 @@
+name: Validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    # Weekly, to catch links to other sites that have moved or gone.
+    - cron: "23 5 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate repo
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate versions, README block, safety checks and links
+        run: bash scripts/validate.sh
+
+  test-windows:
+    name: Tests on Windows (${{ matrix.name }})
+    runs-on: windows-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Windows PowerShell 5.1
+            shell: powershell
+          - name: PowerShell 7
+            shell: pwsh
+    defaults:
+      run:
+        shell: ${{ matrix.shell }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Show the environment
+        run: |
+          $PSVersionTable.PSVersion
+          $ExecutionContext.SessionState.LanguageMode
+          (Get-CimInstance Win32_OperatingSystem).Caption
+
+      - name: Install Pester and PSScriptAnalyzer
+        run: |
+          Install-Module Pester -MinimumVersion 5.5.0 -MaximumVersion 5.99.99 -Scope CurrentUser -Force -SkipPublisherCheck
+          Install-Module PSScriptAnalyzer -Scope CurrentUser -Force
+
+      - name: PSScriptAnalyzer
+        run: |
+          $findings = foreach ($path in 'src', 'tests') {
+            Invoke-ScriptAnalyzer -Path $path -Recurse -Settings ./PSScriptAnalyzerSettings.psd1
+          }
+          if ($findings) { $findings | Format-List RuleName, Severity, ScriptName, Line, Message; exit 1 }
+          'No findings.'
+
+      - name: Pester
+        run: |
+          Import-Module Pester -MinimumVersion 5.5.0
+          $config = New-PesterConfiguration
+          $config.Run.Path = 'tests'
+          $config.Run.Exit = $true
+          $config.Output.Verbosity = 'Detailed'
+          Invoke-Pester -Configuration $config
+
+  test-linux:
+    # The Windows-only tests are skipped here. This checks the argument handling and the
+    # "this is the Windows version" path where PowerShell runs on Linux.
+    name: Tests on Linux (PowerShell 7)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Pester
+        shell: pwsh
+        run: Install-Module Pester -MinimumVersion 5.5.0 -MaximumVersion 5.99.99 -Scope CurrentUser -Force
+
+      - name: Pester
+        shell: pwsh
+        run: |
+          $config = New-PesterConfiguration
+          $config.Run.Path = 'tests'
+          $config.Run.Exit = $true
+          $config.Output.Verbosity = 'Detailed'
+          Invoke-Pester -Configuration $config
+
+  external-links:
+    name: Links to other sites
+    # Other sites move. Check weekly and on demand so it never fails an unrelated pull request.
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check external links
+        run: bash scripts/validate.sh --external
