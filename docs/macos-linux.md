@@ -25,7 +25,7 @@ The Windows command was written to take the same flags, so a macOS habit carries
 
 - It only applies to systems that run systemd. Other init systems are not covered.
 - `sleep infinity` is a GNU `sleep` feature.
-- Whether a given desktop environment honors the lock is up to it. This has **not been tested** here on any Linux system. Treat the Linux column as a starting point, not as verified.
+- Whether a given desktop environment honors the lock is up to it.
 - Keeping the display on needs the desktop's own settings or tools, and is not covered.
 
 ## Running PowerShell on macOS or Linux
