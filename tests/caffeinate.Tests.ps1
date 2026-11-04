@@ -13,7 +13,9 @@ BeforeAll {
     }
 
     # Clears the execution state on this thread and returns the system/display flags that were set before.
+    # The type only exists after caffeinate has run Add-Type, so nothing was set if it is missing.
     function Get-AndClearState {
+        if (-not ('KeepWindowsAwake.Native' -as [type])) { return 0 }
         $esContinuous = [uint32]2147483648
         [int]([KeepWindowsAwake.Native]::SetThreadExecutionState($esContinuous) -band 3)
     }
@@ -131,7 +133,7 @@ Describe 'on Windows' -Skip:($env:OS -ne 'Windows_NT') {
         $script:seen = $null
         Mock Start-Sleep {
             if ($null -eq $script:seen) { $script:seen = Get-AndClearState }
-            Microsoft.PowerShell.Utility\Start-Sleep -Milliseconds 100
+            [Threading.Thread]::Sleep(100)
         }
         $r = Invoke-Caffeinate @{ t = 1 }
         $r.ExitCode | Should -Be 0
@@ -142,7 +144,7 @@ Describe 'on Windows' -Skip:($env:OS -ne 'Windows_NT') {
         $script:seen = $null
         Mock Start-Sleep {
             if ($null -eq $script:seen) { $script:seen = Get-AndClearState }
-            Microsoft.PowerShell.Utility\Start-Sleep -Milliseconds 100
+            [Threading.Thread]::Sleep(100)
         }
         $r = Invoke-Caffeinate @{ d = $true; t = 1 }
         $r.ExitCode | Should -Be 0
@@ -153,7 +155,7 @@ Describe 'on Windows' -Skip:($env:OS -ne 'Windows_NT') {
         $script:seen = $null
         Mock Start-Sleep {
             if ($null -eq $script:seen) { $script:seen = Get-AndClearState }
-            Microsoft.PowerShell.Utility\Start-Sleep -Milliseconds 100
+            [Threading.Thread]::Sleep(100)
         }
         [void](Invoke-Caffeinate @{ i = $true; t = 1 })
         $script:seen | Should -Be 1
