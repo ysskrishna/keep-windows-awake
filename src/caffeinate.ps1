@@ -52,6 +52,7 @@ Project: https://github.com/ysskrishna/keep-windows-awake
 .LINK
 https://github.com/ysskrishna/keep-windows-awake
 #>
+[CmdletBinding(PositionalBinding = $false)]
 param(
     [switch]$d,
     [switch]$i,
@@ -59,13 +60,15 @@ param(
     [switch]$s,
     [switch]$u,
     $t,
-    $w
+    $w,
+    [Parameter(ValueFromRemainingArguments = $true)]$command
 )
 
 # >>> function begin
 # keep-windows-awake 1.0.0 - https://github.com/ysskrishna/keep-windows-awake
 function caffeinate {
-    param([switch]$d, [switch]$i, [switch]$m, [switch]$s, [switch]$u, $t, $w)
+    [CmdletBinding(PositionalBinding = $false)]
+    param([switch]$d, [switch]$i, [switch]$m, [switch]$s, [switch]$u, $t, $w, [Parameter(ValueFromRemainingArguments = $true)]$command)
 
     $global:LASTEXITCODE = 0
     $fail = {
@@ -78,6 +81,11 @@ function caffeinate {
     $mode = "$($ExecutionContext.SessionState.LanguageMode)"
     if ($mode -ne 'FullLanguage') {
         & $fail 1 "this session is in $mode mode, which blocks the Windows call this needs. See https://github.com/ysskrishna/keep-windows-awake/blob/main/docs/methods.md"
+        return
+    }
+
+    if ($command) {
+        & $fail 2 "unexpected argument(s): $($command -join ' '). Supported: -d, -i, -t <seconds>, -w <pid>. Running a command is not supported; use -w <pid> to follow a process."
         return
     }
 

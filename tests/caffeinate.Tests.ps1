@@ -50,6 +50,25 @@ Describe 'arguments' {
         $r.Text | Should -Match '-w needs a process id'
     }
 
+    It 'rejects stray arguments instead of treating them as -t or -w: <case>' -ForEach @(
+        @{ case = 'a command name'; params = @{ command = 'make' } }
+        @{ case = 'a bare number'; params = @{ command = '3600' } }
+        @{ case = 'an unknown flag'; params = @{ command = '-x' } }
+        @{ case = 'a command after -t'; params = @{ t = '5'; command = 'make' } }
+    ) {
+        $r = Invoke-Caffeinate $params
+        $r.ExitCode | Should -Be 2
+        $r.Text | Should -Match 'unexpected argument'
+        $r.Text | Should -Match 'Running a command is not supported'
+    }
+
+    It 'binds -d, -i, -t, -w and -m to its own parameters, not to common ones such as -Debug' {
+        $parameters = (Get-Command caffeinate -CommandType Function).Parameters
+        foreach ($name in 'd', 'i', 'm', 's', 'u') { $parameters[$name].ParameterType | Should -Be ([switch]) }
+        foreach ($name in 't', 'w') { $parameters[$name].Aliases.Count | Should -Be 0 }
+        $parameters['d'].Aliases.Count | Should -Be 0
+    }
+
     It 'checks arguments before the platform, so the same message appears on every OS' {
         (Invoke-Caffeinate @{ t = '0' }).Text | Should -Not -Match 'macOS'
     }
