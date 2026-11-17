@@ -81,20 +81,20 @@ Keep Windows Awake is built and maintained by:
 
 ## Changelog
 
-See [CHANGELOG](https://github.com/ysskrishna/keep-windows-awake/blob/main/CHANGELOG.md) for release history.
+See [CHANGELOG](CHANGELOG.md) for release history.
 
 ## Support
 
-If you find this helpful:
+If you find this project helpful:
 
 - ⭐ Star the repository
-- 🐛 Report issues
+- 🐛 [Report issues](https://github.com/ysskrishna/keep-windows-awake/issues)
 - 🔀 Submit pull requests
 - 💝 [Sponsor on GitHub](https://github.com/sponsors/ysskrishna)
 
 ## License
 
-MIT © [Y. Siva Sai Krishna](https://github.com/ysskrishna) — see [LICENSE](https://github.com/ysskrishna/keep-windows-awake/blob/main/LICENSE) for details.
+MIT © [Y. Siva Sai Krishna](https://github.com/ysskrishna) — see [LICENSE](LICENSE) for details.
 
 ---
 
