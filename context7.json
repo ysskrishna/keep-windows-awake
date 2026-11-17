@@ -1,0 +1,31 @@
+{
+  "$schema": "https://context7.com/schema/context7.json",
+  "url": "https://context7.com/ysskrishna/keep-windows-awake",
+  "public_key": "pk_VesXVq9WjBT8ecKU9XIZz",
+  "projectTitle": "keep-windows-awake",
+  "description": "PowerShell caffeinate command for Windows that keeps a PC awake with the macOS flags -d, -i, -t and -w, with no installer, no admin rights and nothing written to disk, plus guides for locked-down machines.",
+  "excludeFolders": [
+    "archive",
+    "archived",
+    "old",
+    "deprecated",
+    "legacy",
+    "tests",
+    ".github",
+    "assets",
+    "scripts",
+    "src"
+  ],
+  "excludeFiles": [
+    "CHANGELOG.md",
+    "changelog.md",
+    "LICENSE.md",
+    "license.md",
+    "CODE_OF_CONDUCT.md",
+    "NEWS.md",
+    "CONTRIBUTING.md",
+    "SECURITY.md",
+    "AGENTS.md",
+    "development.md"
+  ]
+}
