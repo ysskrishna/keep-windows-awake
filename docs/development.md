@@ -52,4 +52,4 @@ If you run it on another machine, [open an issue](https://github.com/ysskrishna/
    git push origin v1.0.0
    ```
 
-The release workflow stops if the tag, the script version and the top of the CHANGELOG disagree. It then attaches `caffeinate.ps1` and `caffeinate.ps1.sha256` and builds the release notes from the tag message, or else from the matching `CHANGELOG.md` section.
+The release workflow stops if the tag, the script version and the top of the CHANGELOG disagree. It then uses `ysskrishna/changelog-release-action@v1` to attach `caffeinate.ps1` and `caffeinate.ps1.sha256` and create the release from the matching nonempty `CHANGELOG.md` section, titled `Release <tag>`. Missing or empty notes fail; there is no fallback.
